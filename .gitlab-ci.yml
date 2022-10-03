@@ -15,7 +15,7 @@ build:       # This job runs in the build stage, which runs first.
     - echo "$TEST_VAR_JOB"
     - echo "Compile complete."
     - |
-      for FOLDER IN $FOLDERS
+      for FOLDER in $FOLDERS
         do
           echo "The path is root/${FOLDER}"
         done
@@ -28,5 +28,3 @@ deploy:      # This job runs in the deploy stage.
     - echo "Application successfully deployed."
     - echo "$CI_JOB_STAGE"
     - echo "$TEST"
-    - echo "$GREETING"
-    - cat "$GREETING"
