@@ -20,3 +20,7 @@ deploy:      # This job runs in the deploy stage.
   script:
     - echo "This is Job for development..."
     - echo "Application successfully deployed."
+    - echo "$CI_JOB_STAGE"
+    - echo "$TEST"
+    - echo "$GREETING"
+    - cat "$GREETING"
