@@ -1,11 +1,17 @@
+variables:
+  TEST_VAR: "All jobs can use this variable's value"
 stages:          # List of stages for jobs, and their order of execution
   - build
   - deploy
 
 build:       # This job runs in the build stage, which runs first.
   stage: build
+  variables:
+    TEST_VAR_JOB: "Only build can use this variable's value"
   script:
     - echo "This is Job for build..."
+    - echo "$TEST_VAR"
+    - echo "$TEST_VAR_JOB"
     - echo "Compile complete."
 
 deploy:      # This job runs in the deploy stage.
