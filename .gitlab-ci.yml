@@ -1,38 +1,40 @@
+image: registry.gitlab.com/tms39/laravel-first:latest
+
+services:
+  - mysql:5.7
+
 variables:
-  TEST_VAR: "All jobs can use this variable's value"
-stages:          # List of stages for jobs, and their order of execution
-  - build
+  MYSQL_DATABASE: homestead
+  MYSQL_ROOT_PASSWORD: secret
+  DB_HOST: mysql
+  DB_USERNAME: root
+
+stages:
+  - test
   - deploy
 
-build:       # This job runs in the build stage, which runs first.
-  stage: build
-  variables:
-    TEST_VAR_JOB: "Only build can use this variable's value"
-    FOLDERS: src build docs
+unit_test:
+  stage: test
   script:
-    - echo "This is Job for build..."
-    - echo "$TEST_VAR"
-    - echo "$TEST_VAR_JOB"
-    - echo "Compile complete."
-    - |
-      for FOLDER in $FOLDERS
-        do
-          echo "The path is root/${FOLDER}"
-        done
+    - cp .env.example .env
+    - composer install
+    - php artisan key:generate
+    - php artisan migrate
+    - vendor/bin/phpunit
 
-deploy:      # This job runs in the deploy stage.
-  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
-  environment: production
-  services:
-    - php:7
-    - node:latest
-    - golang:1.10
-  image: alpine:3.7
+deploy_production:
+  stage: deploy
   script:
-    - echo "This is Job for development..."
-    - echo "Application successfully deployed."
-    - echo "$CI_JOB_STAGE"
-    - echo "$TEST"
-    - php -v
-    - node -v
-    - go version
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
+    - ~/.composer/vendor/bin/envoy run deploy --commit="$CI_COMMIT_SHA"
+  environment:
+    name: production
+    url: http://3.112.35.74
+  when: manual
+  only:
+    - main
