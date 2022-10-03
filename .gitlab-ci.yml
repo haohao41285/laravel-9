@@ -8,11 +8,17 @@ build:       # This job runs in the build stage, which runs first.
   stage: build
   variables:
     TEST_VAR_JOB: "Only build can use this variable's value"
+    FOLDERS: src build docs
   script:
     - echo "This is Job for build..."
     - echo "$TEST_VAR"
     - echo "$TEST_VAR_JOB"
     - echo "Compile complete."
+    - |
+      for FOLDER IN $FOLDERS
+        do
+          echo "The path is root/${FOLDER}"
+        done
 
 deploy:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
