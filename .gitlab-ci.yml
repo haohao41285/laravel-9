@@ -23,8 +23,16 @@ build:       # This job runs in the build stage, which runs first.
 deploy:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
   environment: production
+  services:
+    - php:7
+    - node:latest
+    - golang:1.10
+  image: alpine:3.7
   script:
     - echo "This is Job for development..."
     - echo "Application successfully deployed."
     - echo "$CI_JOB_STAGE"
     - echo "$TEST"
+    - php -v
+    - node -v
+    - go version
