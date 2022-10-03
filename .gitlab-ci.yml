@@ -26,7 +26,8 @@ deploy_production:
   script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
     - eval $(ssh-agent -s)
-    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - ssh-add "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - chmod 700 ~/.ssh
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
 
@@ -34,6 +35,5 @@ deploy_production:
   environment:
     name: production
     url: http://3.112.35.74
-  when: manual
   only:
     - main
